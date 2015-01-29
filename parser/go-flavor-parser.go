@@ -6,7 +6,7 @@ import (
 	"github.com/kisielk/gotool"
 	"os"
 
-	. "github.com/bunniesandbeatings/go-flavor-parser/parser/packages"
+	. "github.com/bunniesandbeatings/go-flavor-parser/packages"
 )
 
 func usage() {
