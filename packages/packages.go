@@ -1,12 +1,25 @@
 package packages
 
+import (
+	"fmt"
+	"go/build"
+)
+
 type Package struct {
-	Name string
+	*build.Package
 }
 
 func CreatePackage(packageName string) Package {
+	buildPackage, err := build.Import(packageName, ".", 0)
 
-	return Package{
-		Name: packageName,
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
 	}
+
+	packageDef := Package{
+		buildPackage,
+	}
+
+	return packageDef
 }

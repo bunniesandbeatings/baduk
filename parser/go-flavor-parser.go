@@ -26,9 +26,12 @@ func main() {
 	packages := []Package{}
 
 	for _, packageName := range gotool.ImportPaths(importSpec) {
+		fmt.Printf("Parsing: %s\n", packageName)
 		packageDef := CreatePackage(packageName)
 		packages = append(packages, packageDef)
 	}
 
-	fmt.Println(packages)
+	for _, def := range packages {
+		fmt.Printf("Package: %s\n", def.Name)
+	}
 }
