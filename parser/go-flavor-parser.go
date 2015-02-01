@@ -6,7 +6,9 @@ import (
 	"github.com/kisielk/gotool"
 	"os"
 
+	"encoding/xml"
 	. "github.com/bunniesandbeatings/go-flavor-parser/packages"
+	. "github.com/bunniesandbeatings/go-flavor-parser/structure101/datafiles"
 )
 
 func usage() {
@@ -26,12 +28,36 @@ func main() {
 	packages := []Package{}
 
 	for _, packageName := range gotool.ImportPaths(importSpec) {
-		fmt.Printf("Parsing: %s\n", packageName)
 		packageDef := CreatePackage(packageName)
 		packages = append(packages, packageDef)
 	}
 
-	for _, def := range packages {
-		fmt.Printf("Package: %s\n", def.Name)
+	dataFile := packagesToDataFile(packages)
+
+	output, err := xml.MarshalIndent(dataFile, "", "  ")
+	if err != nil {
+		fmt.Printf("error when Marshalling Data File definition: %v\n", err)
+	}
+
+	fmt.Println(string(output))
+
+}
+
+func packagesToDataFile(packages []Package) *DataFile {
+
+	modules := []Module{}
+
+	for id, packageDef := range packages {
+		newModule := Module{
+			Name: packageDef.Name,
+			Id:   id + 1,
+			Type: "package",
+		}
+		modules = append(modules, newModule)
+	}
+
+	return &DataFile{
+		Flavor:  "com.bunniesandbeatings.go-flavor",
+		Modules: modules,
 	}
 }
