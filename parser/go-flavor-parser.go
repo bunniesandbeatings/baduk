@@ -24,13 +24,11 @@ func main() {
 	flag.Parse()
 
 	importSpec := []string{flag.Arg(0)}
+	projectImportPaths := gotool.ImportPaths(importSpec)
 
-	packages := []Package{}
+	packages := CreatePackages(projectImportPaths)
 
-	for _, packageName := range gotool.ImportPaths(importSpec) {
-		packageDef := CreatePackage(packageName)
-		packages = append(packages, packageDef)
-	}
+	packages.ExpandImportedPackages()
 
 	dataFile := packagesToDataFile(packages)
 
@@ -40,20 +38,23 @@ func main() {
 	}
 
 	fmt.Println(string(output))
-
 }
 
-func packagesToDataFile(packages []Package) *DataFile {
-
+func packagesToDataFile(packages Packages) *DataFile {
 	modules := []Module{}
 
-	for id, packageDef := range packages {
+	id := 1
+
+	for name, _ := range packages.ByImportPath {
 		newModule := Module{
-			Name: packageDef.Name,
-			Id:   id + 1,
+			Name: name,
+			Id:   id,
 			Type: "package",
 		}
+
 		modules = append(modules, newModule)
+
+		id++
 	}
 
 	return &DataFile{

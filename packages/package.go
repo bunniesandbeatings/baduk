@@ -9,8 +9,8 @@ type Package struct {
 	*build.Package
 }
 
-func CreatePackage(packageName string) Package {
-	buildPackage, err := build.Import(packageName, ".", 0)
+func CreatePackage(importPath string) Package {
+	buildPackage, err := build.Import(importPath, ".", 0)
 
 	if err != nil {
 		fmt.Println(err)
