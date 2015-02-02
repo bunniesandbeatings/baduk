@@ -7,7 +7,7 @@ import (
 type Module struct {
 	XMLName xml.Name `xml:"module"`
 	Name    string   `xml:"name,attr"`
-	Id      int      `xml:"id,attr"`
+	Id      string   `xml:"id,attr"`
 	Type    string   `xml:"type,attr"`
 }
 

@@ -43,18 +43,14 @@ func main() {
 func packagesToDataFile(packages Packages) *DataFile {
 	modules := []Module{}
 
-	id := 1
-
-	for name, _ := range packages.ByImportPath {
+	for name, packageDef := range packages.ByImportPath {
 		newModule := Module{
 			Name: name,
-			Id:   id,
+			Id:   packageDef.UniqueID(),
 			Type: "package",
 		}
 
 		modules = append(modules, newModule)
-
-		id++
 	}
 
 	return &DataFile{

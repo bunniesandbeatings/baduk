@@ -1,8 +1,11 @@
 package packages
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"go/build"
+	"io"
 )
 
 type Package struct {
@@ -22,4 +25,10 @@ func CreatePackage(importPath string) Package {
 	}
 
 	return packageDef
+}
+func (packageDef Package) UniqueID() string {
+
+	hash := md5.New()
+	io.WriteString(hash, packageDef.ImportPath)
+	return hex.EncodeToString(hash.Sum([]byte{}))
 }
