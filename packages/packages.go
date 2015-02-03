@@ -19,8 +19,13 @@ func (packages *Packages) AddByImportPaths(importPaths []string, recur bool) {
 	}
 }
 
+func (packages *Packages) FindByImportPath(importPath string) (Package, bool) {
+	packageDef, found := packages.byImportPath[importPath]
+	return packageDef, found
+}
+
 func (packages *Packages) AddByImportPath(importPath string, recur bool) {
-	_, found := packages.byImportPath[importPath]
+	_, found := packages.FindByImportPath(importPath)
 
 	if found {
 		return
@@ -30,12 +35,12 @@ func (packages *Packages) AddByImportPath(importPath string, recur bool) {
 
 	if err != nil {
 		fmt.Printf("Could not find import (skipping): '%s'\n", importPath)
-		packages.byImportPath[importPath] = Package{}
 		return
 	}
 
 	packages.byImportPath[importPath] = *packageDef
 	packages.handleNewPackage(*packageDef)
+	
 	if recur {
 		packages.AddByImportPaths(packageDef.Imports, true)
 	}

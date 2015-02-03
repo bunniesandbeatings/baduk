@@ -21,8 +21,8 @@ type Dependency struct {
 type DataFile struct {
 	XMLName      xml.Name `xml:"data"`
 	Flavor       string   `xml:"flavor,attr"`
-	Dependencies []Dependency
 	Modules      []Module
+	Dependencies []Dependency
 }
 
 func NewDataFile(flavorName string) *DataFile{

@@ -22,7 +22,7 @@ func main() {
 	projectImportPaths := importPathsFromCommandLine()
 	
 	parser := NewParser()
-	parser.AddImports(projectImportPaths)
+	parser.AddImportPaths(projectImportPaths)
 
 	fmt.Println(string(parser.DataFileXML()))
 }

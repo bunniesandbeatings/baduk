@@ -15,7 +15,7 @@ type Parser struct {
 
 func NewParser() *Parser {
 	parser := Parser{}
-	
+
 	parser.dataFile = *NewDataFile("com.bunniesandbeatings.go-flavor")
 
 	parser.packages = *NewPackages()
@@ -25,7 +25,7 @@ func NewParser() *Parser {
 	return &parser
 }
 
-func (parser *Parser) AddImports(importPaths []string) {
+func (parser *Parser) AddImportPaths(importPaths []string) {
 	parser.packages.AddByImportPaths(importPaths, true)
 }
 
@@ -36,8 +36,25 @@ func (parser *Parser) createNewPackageHandler() func(Package) {
 			Id:   packageDef.UniqueId(),
 			Type: "package",
 		}
-		
+
 		parser.dataFile.Modules = append(parser.dataFile.Modules, newModule)
+
+//		fmt.Printf("Parsing: %s\n", packageDef.ImportPath)
+		
+		for _, dependencyImportPath := range packageDef.Imports {
+			importPackage, found := parser.packages.FindByImportPath(dependencyImportPath)
+
+			if found {
+//				fmt.Printf("\t-> %s\n", importPackage.ImportPath)
+
+				newDependency := Dependency{
+					From: packageDef.UniqueId(),
+					To: importPackage.UniqueId(),
+					Type: "imports",
+				}
+				parser.dataFile.Dependencies = append(parser.dataFile.Dependencies, newDependency)
+			}
+		}
 	}
 }
 
