@@ -25,8 +25,8 @@ type DataFile struct {
 	Modules      []Module
 }
 
-func NewDataFile(flavorName string) DataFile{
-	return DataFile{
+func NewDataFile(flavorName string) *DataFile{
+	return &DataFile{
 		Flavor:       flavorName,
 		Modules:      []Module{},
 		Dependencies: []Dependency{},

@@ -12,7 +12,7 @@ type Package struct {
 	*build.Package
 }
 
-func CreatePackage(importPath string) Package {
+func CreatePackage(importPath string) *Package {
 	buildPackage, err := build.Import(importPath, ".", 0)
 
 	if err != nil {
@@ -24,7 +24,7 @@ func CreatePackage(importPath string) Package {
 		buildPackage,
 	}
 
-	return packageDef
+	return &packageDef
 }
 
 func (packageDef *Package) UniqueId() string {

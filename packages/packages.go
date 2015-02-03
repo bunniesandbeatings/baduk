@@ -1,13 +1,13 @@
 package packages
 
 type Packages struct {
-	ByImportPath map[string]Package
+	byImportPath map[string]Package
 	NewPackageHandler func(Package)
 }
 
-func NewPackages() Packages {
-	return Packages{
-		ByImportPath: make(map[string]Package),
+func NewPackages() *Packages {
+	return &Packages{
+		byImportPath: make(map[string]Package),
 	}
 }
 
@@ -18,14 +18,16 @@ func (packages *Packages) AddByImportPaths(importPaths []string, recur bool) {
 
 }
 
-func (packages *Packages) AddByImportPath(importPath string, recur bool) (packageDef Package, found bool) {
-	packageDef, found = packages.ByImportPath[importPath]
+func (packages *Packages) AddByImportPath(importPath string, recur bool) {
+	_, found := packages.byImportPath[importPath]
 
 	if !found {
-		packageDef = CreatePackage(importPath)
-		
+		packageDef := CreatePackage(importPath)
+	
+		packages.byImportPath[importPath] = *packageDef
+
 		if packages.NewPackageHandler != nil {
-			packages.NewPackageHandler(packageDef)
+			packages.NewPackageHandler(*packageDef)
 		}
 		
 		if recur{
@@ -33,6 +35,5 @@ func (packages *Packages) AddByImportPath(importPath string, recur bool) (packag
 		}
 	}
 
-	return packageDef, found
 }
 
