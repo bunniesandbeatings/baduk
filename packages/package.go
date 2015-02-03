@@ -3,7 +3,6 @@ package packages
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"go/build"
 	"io"
 )
@@ -12,19 +11,18 @@ type Package struct {
 	*build.Package
 }
 
-func CreatePackage(importPath string) *Package {
+func CreatePackage(importPath string) (*Package, error) {
 	buildPackage, err := build.Import(importPath, ".", 0)
 
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		return nil, err
 	}
 
 	packageDef := Package{
 		buildPackage,
 	}
 
-	return &packageDef
+	return &packageDef, err
 }
 
 func (packageDef *Package) UniqueId() string {

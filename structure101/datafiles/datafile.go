@@ -31,5 +31,4 @@ func NewDataFile(flavorName string) *DataFile{
 		Modules:      []Module{},
 		Dependencies: []Dependency{},
 	}
-
 }

@@ -26,7 +26,7 @@ func NewParser() *Parser {
 }
 
 func (parser *Parser) AddImports(importPaths []string) {
-	parser.packages.AddByImportPaths(importPaths, false)
+	parser.packages.AddByImportPaths(importPaths, true)
 }
 
 func (parser *Parser) createNewPackageHandler() func(Package) {
