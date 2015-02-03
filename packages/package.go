@@ -26,9 +26,10 @@ func CreatePackage(importPath string) Package {
 
 	return packageDef
 }
-func (packageDef Package) UniqueID() string {
 
+func (packageDef *Package) UniqueId() string {
 	hash := md5.New()
 	io.WriteString(hash, packageDef.ImportPath)
+
 	return hex.EncodeToString(hash.Sum([]byte{}))
 }

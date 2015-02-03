@@ -11,8 +11,25 @@ type Module struct {
 	Type    string   `xml:"type,attr"`
 }
 
+type Dependency struct {
+	XMLName xml.Name `xml:"dependency"`
+	From    string   `xml:"from,attr"`
+	To      string   `xml:"to,attr"`
+	Type    string   `xml:"type,attr"`
+}
+
 type DataFile struct {
-	XMLName xml.Name `xml:"data"`
-	Flavor  string   `xml:"flavor,attr"`
-	Modules []Module
+	XMLName      xml.Name `xml:"data"`
+	Flavor       string   `xml:"flavor,attr"`
+	Dependencies []Dependency
+	Modules      []Module
+}
+
+func NewDataFile(flavorName string) DataFile{
+	return DataFile{
+		Flavor:       flavorName,
+		Modules:      []Module{},
+		Dependencies: []Dependency{},
+	}
+
 }

@@ -2,46 +2,37 @@ package packages
 
 type Packages struct {
 	ByImportPath map[string]Package
+	NewPackageHandler func(Package)
 }
 
-func CreatePackages(importPaths []string) Packages {
-	packages := Packages{
+func NewPackages() Packages {
+	return Packages{
 		ByImportPath: make(map[string]Package),
 	}
-	packages.AddPackagesByImportPaths(importPaths)
-
-	return packages
 }
 
-func (packages *Packages) AddPackageByImportPath(importPath string) Package {
-	var packageDef Package
-
-	if packageDef, present := packages.ByImportPath[importPath]; !present {
-		packageDef = CreatePackage(importPath)
-		packages.ByImportPath[importPath] = packageDef
-	}
-
-	return packageDef
-}
-
-func (packages *Packages) AddPackagesByImportPaths(importPaths []string) {
+func (packages *Packages) AddByImportPaths(importPaths []string, recur bool) {
 	for _, importPath := range importPaths {
-		packages.AddPackageByImportPath(importPath)
+		packages.AddByImportPath(importPath, recur)
 	}
+
 }
 
-func (packages *Packages) ExpandImportedPackages() {
-	// Avoid expanding the map while iterating
-	currentPackageList := []string{}
+func (packages *Packages) AddByImportPath(importPath string, recur bool) (packageDef Package, found bool) {
+	packageDef, found = packages.ByImportPath[importPath]
 
-	for importPath, _ := range packages.ByImportPath {
-		currentPackageList = append(currentPackageList, importPath)
-	}
-
-	for _, importPath := range currentPackageList {
-		for _, dependencyImportPath := range packages.ByImportPath[importPath].Imports {
-			packages.AddPackageByImportPath(dependencyImportPath)
+	if !found {
+		packageDef = CreatePackage(importPath)
+		
+		if packages.NewPackageHandler != nil {
+			packages.NewPackageHandler(packageDef)
+		}
+		
+		if recur{
+			packages.AddByImportPaths(packageDef.Imports, true)
 		}
 	}
 
+	return packageDef, found
 }
+

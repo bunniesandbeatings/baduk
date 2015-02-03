@@ -20,41 +20,46 @@ func usage() {
 }
 
 func main() {
+	projectImportPaths := importPathsFromCommandLine()
+	
+	dataFile := NewDataFile("com.bunniesandbeatings.go-flavor")
+
+	packages := NewPackages()
+	packages.NewPackageHandler = CreateNewPackageHandler(&dataFile)
+
+	packages.AddByImportPaths(projectImportPaths, false)
+
+	dataFileXML := marshalDatafile(dataFile)
+
+	fmt.Println(string(dataFileXML))
+}
+
+func CreateNewPackageHandler(datafile *DataFile) func(Package) {
+	return func(packageDef Package) {
+		newModule := Module{
+			Name:
+			packageDef.ImportPath,
+			Id:   packageDef.UniqueId(),
+			Type: "package",
+		}
+
+		datafile.Modules = append(datafile.Modules, newModule)
+	}
+}
+
+func importPathsFromCommandLine() []string {
 	flag.Usage = usage
 	flag.Parse()
 
 	importSpec := []string{flag.Arg(0)}
-	projectImportPaths := gotool.ImportPaths(importSpec)
 
-	packages := CreatePackages(projectImportPaths)
+	return gotool.ImportPaths(importSpec)
+}
 
-	packages.ExpandImportedPackages()
-
-	dataFile := packagesToDataFile(packages)
-
-	output, err := xml.MarshalIndent(dataFile, "", "  ")
+func marshalDatafile(dataFile DataFile) []byte {
+	dataFileXML, err := xml.MarshalIndent(dataFile, "", "  ")
 	if err != nil {
 		fmt.Printf("error when Marshalling Data File definition: %v\n", err)
 	}
-
-	fmt.Println(string(output))
-}
-
-func packagesToDataFile(packages Packages) *DataFile {
-	modules := []Module{}
-
-	for name, packageDef := range packages.ByImportPath {
-		newModule := Module{
-			Name: name,
-			Id:   packageDef.UniqueID(),
-			Type: "package",
-		}
-
-		modules = append(modules, newModule)
-	}
-
-	return &DataFile{
-		Flavor:  "com.bunniesandbeatings.go-flavor",
-		Modules: modules,
-	}
+	return dataFileXML
 }
