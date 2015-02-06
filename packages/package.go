@@ -11,8 +11,8 @@ type Package struct {
 	*build.Package
 }
 
-func CreatePackage(importPath string) (*Package, error) {
-	buildPackage, err := build.Import(importPath, ".", 0)
+func CreatePackage(importPath string, buildContext build.Context) (*Package, error) {
+	buildPackage, err := buildContext.Import(importPath, ".", 0)
 
 	if err != nil {
 		return nil, err

@@ -9,24 +9,24 @@ import (
 )
 
 type Parser struct {
-	dataFile DataFile
-	packages Packages
+	Datafile DataFile
+	Packages Packages
 }
 
 func NewParser() *Parser {
 	parser := Parser{}
 
-	parser.dataFile = *NewDataFile("com.bunniesandbeatings.go-flavor")
+	parser.Datafile = *NewDataFile("com.bunniesandbeatings.go-flavor")
 
-	parser.packages = *NewPackages()
+	parser.Packages = *NewPackages()
 	// TODO make a NewPackageHandler interface
-	parser.packages.NewPackageHandler = parser.createNewPackageHandler()
+	parser.Packages.NewPackageHandler = parser.createNewPackageHandler()
 
 	return &parser
 }
 
 func (parser *Parser) AddImportPaths(importPaths []string) {
-	parser.packages.AddByImportPaths(importPaths, true)
+	parser.Packages.AddByImportPaths(importPaths, true)
 }
 
 func (parser *Parser) createNewPackageHandler() func(Package) {
@@ -37,29 +37,25 @@ func (parser *Parser) createNewPackageHandler() func(Package) {
 			Type: "package",
 		}
 
-		parser.dataFile.Modules = append(parser.dataFile.Modules, newModule)
+		parser.Datafile.Modules = append(parser.Datafile.Modules, newModule)
 
-//		fmt.Printf("Parsing: %s\n", packageDef.ImportPath)
-		
 		for _, dependencyImportPath := range packageDef.Imports {
-			importPackage, found := parser.packages.FindByImportPath(dependencyImportPath)
+			importPackage, found := parser.Packages.FindByImportPath(dependencyImportPath)
 
 			if found {
-//				fmt.Printf("\t-> %s\n", importPackage.ImportPath)
-
 				newDependency := Dependency{
 					From: packageDef.UniqueId(),
 					To: importPackage.UniqueId(),
 					Type: "imports",
 				}
-				parser.dataFile.Dependencies = append(parser.dataFile.Dependencies, newDependency)
+				parser.Datafile.Dependencies = append(parser.Datafile.Dependencies, newDependency)
 			}
 		}
 	}
 }
 
 func (parser *Parser) DataFileXML() []byte {
-	dataFileXML, err := xml.MarshalIndent(parser.dataFile, "", "  ")
+	dataFileXML, err := xml.MarshalIndent(parser.Datafile, "", "  ")
 	if err != nil {
 		fmt.Printf("error when Marshalling Data File definition: %v\n", err)
 	}

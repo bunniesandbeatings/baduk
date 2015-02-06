@@ -1,15 +1,20 @@
 package packages
 
-import "fmt"
+import (
+	"fmt"
+	"go/build"
+)
 
 type Packages struct {
 	byImportPath map[string]Package
 	NewPackageHandler func(Package)
+	BuildContext build.Context
 }
 
 func NewPackages() *Packages {
 	return &Packages{
 		byImportPath: make(map[string]Package),
+		BuildContext: build.Default,
 	}
 }
 
@@ -31,7 +36,7 @@ func (packages *Packages) AddByImportPath(importPath string, recur bool) {
 		return
 	}
 
-	packageDef, err := CreatePackage(importPath)
+	packageDef, err := CreatePackage(importPath, packages.BuildContext)
 
 	if err != nil {
 		fmt.Printf("Could not find import (skipping): '%s'\n", importPath)
