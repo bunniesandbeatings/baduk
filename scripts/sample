@@ -1,0 +1,3 @@
+./scripts/compile
+
+final/parser -output final/output.xml github.com/bunniesandbeatings/go-flavor-parser/...
