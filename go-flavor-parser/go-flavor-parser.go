@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"os"
 	"go/build"
+	"io/ioutil"
 )
 
 var (
-	gopath string
+	goPath string
+	outputPath string
 	showUsage bool
 )
 
@@ -29,22 +31,26 @@ func main() {
 
 	parser := NewParser()
 
-	if gopath != "" {
+	if goPath != "" {
 		buildContext := build.Default
-		buildContext.GOPATH = gopath
+		buildContext.GOPATH = goPath
 
 		parser.Packages.BuildContext = buildContext
 	}
-	
+
 	fmt.Printf("Using GOPATH='%s'\n", parser.Packages.BuildContext.GOPATH)
-	
+
 	parser.AddImportPaths(projectImportPaths)
 
-	fmt.Println(string(parser.DataFileXML()))
+	ioutil.WriteFile(outputPath, parser.DataFileXML(), 0644)
+	
+	fmt.Printf("Output written to '%s'\n", outputPath)
 }
 
 func importPathsFromCommandLine() []string {
-	flag.StringVar(&gopath, "gopath", os.Getenv("GOPATH"), "allows you to choose a different GOPATH to use during analysis")
+	flag.StringVar(&goPath, "gopath", os.Getenv("GOPATH"), "allows you to choose a different GOPATH to use during analysis")
+	flag.StringVar(&outputPath, "output", "./output.xml", "where to output the result of the analysis")
+
 	flag.Usage = usage
 	flag.Parse()
 
