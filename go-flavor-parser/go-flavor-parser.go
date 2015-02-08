@@ -15,7 +15,6 @@ import (
 var (
 	goPath string
 	outputPath string
-	showUsage bool
 )
 
 func usage() {
@@ -39,8 +38,9 @@ func main() {
 	}
 
 	fmt.Printf("Using GOPATH='%s'\n", parser.Packages.BuildContext.GOPATH)
-
+	
 	parser.AddImportPaths(projectImportPaths)
+	fmt.Printf("Ran with arguments: %s\n", os.Args)
 
 	ioutil.WriteFile(outputPath, parser.DataFileXML(), 0644)
 	
