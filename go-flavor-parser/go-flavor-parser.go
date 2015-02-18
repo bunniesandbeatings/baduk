@@ -1,17 +1,15 @@
 package main
 
 import (
-	. "github.com/bunniesandbeatings/go-flavor-parser/parser"
-
 	"github.com/bunniesandbeatings/gotool"
+	"github.com/bunniesandbeatings/go-flavor-parser/files"
+
+	"github.com/tonnerre/golang-pretty"
 
 	"flag"
 	"fmt"
-	"github.com/tonnerre/golang-pretty"
-
 	"os"
 	"go/build"
-	"io/ioutil"
 )
 
 var (
@@ -32,28 +30,28 @@ func usage() {
 func main() {
 	handleCommandLine()
 
+	fmt.Printf("Ran with arguments: %s\n", os.Args)
+
 	buildContext := buildContext()
-	
+	fmt.Printf("\n*** Context ***\n%# v\n\n", pretty.Formatter(buildContext))
+
 	gotool.SetContext(buildContext)
 	projectImportPaths := gotool.ImportPaths([]string{importSpec})
 
-	parser := NewParser()
+	_, allFiles := files.GetFiles(buildContext, nil, projectImportPaths)
 
-	fmt.Printf("\n*** Context ***\n%# v\n\n", pretty.Formatter(buildContext))
-	parser.Packages.BuildContext = buildContext
+	//	datafile = Parse(buildContext, projectImportPaths)
 
-	fmt.Printf("Using GOPATH='%s'\n", parser.Packages.BuildContext.GOPATH)
+	//	ioutil.WriteFile(outputPath, parser.DataFileXML(), 0644)
 
-	parser.AddImportPaths(projectImportPaths)
-	fmt.Printf("Ran with arguments: %s\n", os.Args)
+	//	fmt.Printf("Output written to '%s'\n", outputPath)
+	fmt.Printf("\n*** all packages ***\n%# v\n\n", pretty.Formatter(allFiles))
 
-	ioutil.WriteFile(outputPath, parser.DataFileXML(), 0644)
-
-	fmt.Printf("Output written to '%s'\n", outputPath)
 }
 
 func handleCommandLine() {
 	flag.StringVar(&goPath, "gopath", os.Getenv("GOPATH"), "allows you to choose a different GOPATH to use during analysis")
+
 	flag.StringVar(&goRoot, "goroot", os.Getenv("GOROOT"), "allows you to choose a different GOROOT to use during analysis")
 	flag.StringVar(&outputPath, "output", "./output.xml", "where to output the result of the analysis")
 
