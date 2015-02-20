@@ -1,76 +1,65 @@
 package main
 
 import (
-	"github.com/bunniesandbeatings/gotool"
 	"github.com/bunniesandbeatings/go-flavor-parser/files"
-
-	"github.com/tonnerre/golang-pretty"
+	"github.com/bunniesandbeatings/go-flavor-parser/context"
 
 	"flag"
-	"fmt"
+	"log"
 	"os"
-	"go/build"
-)
-
-var (
-	goPath string
-	goRoot string
-	outputPath string
-	importSpec string
+	"go/token"
+	. "go/parser"
+	"go/ast"
+	"strings"
 )
 
 func usage() {
 	appName := os.Args[0]
-	fmt.Fprintf(os.Stderr, "%s usage:\n", appName)
-	fmt.Fprintf(os.Stderr, "\t%s [flags] packages # see 'go help packages'\n", appName)
-	fmt.Fprintf(os.Stderr, "Flags:\n")
+	log.Printf("%s usage:\n", appName)
+	log.Printf("\t%s [flags] packages # see 'go help packages'\n", appName)
+	log.Printf("Flags:\n")
 	flag.PrintDefaults()
 }
 
 func main() {
-	handleCommandLine()
+	commandContext := context.CreateCommandContext(usage)
+	buildContext := context.CreateBuildContext(commandContext)
 
-	fmt.Printf("Ran with arguments: %s\n", os.Args)
+	allFiles := files.GetFilesFromImportSpec(buildContext, commandContext.ImportSpec)
 
-	buildContext := buildContext()
-	fmt.Printf("\n*** Context ***\n%# v\n\n", pretty.Formatter(buildContext))
+	log.Printf("\n*** Files to process ***\n  %#s\n\n", strings.Join(allFiles, "\n  "))
+	
+	fset := token.NewFileSet()
 
-	gotool.SetContext(buildContext)
-	projectImportPaths := gotool.ImportPaths([]string{importSpec})
-
-	_, allFiles := files.GetFiles(buildContext, nil, projectImportPaths)
-
-	//	datafile = Parse(buildContext, projectImportPaths)
-
-	//	ioutil.WriteFile(outputPath, parser.DataFileXML(), 0644)
-
-	//	fmt.Printf("Output written to '%s'\n", outputPath)
-	fmt.Printf("\n*** all packages ***\n%# v\n\n", pretty.Formatter(allFiles))
-
-}
-
-func handleCommandLine() {
-	flag.StringVar(&goPath, "gopath", os.Getenv("GOPATH"), "allows you to choose a different GOPATH to use during analysis")
-
-	flag.StringVar(&goRoot, "goroot", os.Getenv("GOROOT"), "allows you to choose a different GOROOT to use during analysis")
-	flag.StringVar(&outputPath, "output", "./output.xml", "where to output the result of the analysis")
-
-	flag.Usage = usage
-	flag.Parse()
-
-	importSpec = flag.Arg(0)
-}
-
-func buildContext() build.Context {
-	buildContext := build.Default
-
-	if goPath != "" {
-		buildContext.GOPATH = goPath
+	allPackages, err := ParseFiles(fset, allFiles, 0)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
-	if goRoot != "" {
-		buildContext.GOROOT = goRoot
+	for name, pkg := range allPackages {
+		log.Printf("\n*** Package***\nName: %s\nFiles: %#v\n\n", name, pkg.Files)
+	}
+}
+
+func ParseFiles(fset *token.FileSet, files []string, mode Mode) (pkgs map[string]*ast.Package, first error) {
+	pkgs = make(map[string]*ast.Package)
+	for _, filename := range files {
+		if src, err := ParseFile(fset, filename, nil, mode); err == nil {
+			name := src.Name.Name
+			pkg, found := pkgs[name]
+			if !found {
+				pkg = &ast.Package{
+					Name:  name,
+					Files: make(map[string]*ast.File),
+				}
+				pkgs[name] = pkg
+			}
+			pkg.Files[filename] = src
+		} else if first == nil {
+			first = err
+		}
 	}
 
-	return buildContext
+	return
 }
