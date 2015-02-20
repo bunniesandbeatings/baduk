@@ -4,7 +4,8 @@ import (
 	"github.com/mndrix/ps"
 	"github.com/bunniesandbeatings/gotool"
 
-	"fmt"
+	"strings"
+	"log"
 	"go/build"
 )
 
@@ -14,10 +15,11 @@ func GetFilesFromImportSpec(buildContext build.Context, importSpec string) []str
 
 	visitedPackages := ps.NewMap()
 	_, files := getFilesFromImportPaths(buildContext, visitedPackages, importPaths)
-	
+
+	log.Printf("\n*** Files to process ***\n  %#s\n\n", strings.Join(files, "\n  "))
+
 	return files
 }
-
 
 func getFilesFromImportPaths(buildContext build.Context, visitedPackages ps.Map, importPaths []string) (newVisitedPackages ps.Map, files []string) {
 	for _, importPath := range importPaths {
@@ -35,7 +37,7 @@ func getFilesFromImportPaths(buildContext build.Context, visitedPackages ps.Map,
 
 				files = append(files, filesFromImports...)
 			} else {
-				fmt.Printf("WARNING: could not get file list for '%s', go/build#import failed with: %s", importPath, err)
+				log.Printf("WARNING: could not get file list for '%s', go/build#import failed with: %s", importPath, err)
 			}
 		}
 	}
