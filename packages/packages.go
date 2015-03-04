@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func GetPackagesFromFileList(files []string) map[string]*ast.Package {
+func Packages(files []string) map[string]*ast.Package {
 	fset := token.NewFileSet()
 
 	allPackages, err := ParseFiles(fset, files, 0)
@@ -16,6 +16,7 @@ func GetPackagesFromFileList(files []string) map[string]*ast.Package {
 	}
 
 	for name, pkg := range allPackages {
+		log.Printf("\nPackage: %#v", pkg)
 		log.Printf("\n*** Package***\nName: %s\nFiles: %#v\n\n", name, pkg.Files)
 	}
 
@@ -24,6 +25,7 @@ func GetPackagesFromFileList(files []string) map[string]*ast.Package {
 
 func ParseFiles(fset *token.FileSet, files []string, mode parser.Mode) (pkgs map[string]*ast.Package, first error) {
 	pkgs = make(map[string]*ast.Package)
+	
 	for _, filename := range files {
 		if src, err := parser.ParseFile(fset, filename, nil, mode); err == nil {
 			name := src.Name.Name
@@ -43,4 +45,3 @@ func ParseFiles(fset *token.FileSet, files []string, mode parser.Mode) (pkgs map
 
 	return
 }
-

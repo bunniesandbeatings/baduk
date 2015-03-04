@@ -2,11 +2,18 @@ package main
 
 import (
 	"github.com/bunniesandbeatings/go-flavor-parser/files"
-	"github.com/bunniesandbeatings/go-flavor-parser/context"
-	"github.com/bunniesandbeatings/go-flavor-parser/packages"
+	"github.com/bunniesandbeatings/go-flavor-parser/contexts"
+	"github.com/bunniesandbeatings/go-flavor-parser/structure101/datafiles"
 
+	//	"github.com/bunniesandbeatings/go-flavor-parser/packages"
+	. "github.com/mndrix/ps"
+
+	"go/ast"
+	
+	"io/ioutil"
 	"flag"
 	"log"
+	"fmt"
 	"os"
 )
 
@@ -19,11 +26,35 @@ func usage() {
 }
 
 func main() {
-	commandContext := context.CreateCommandContext(usage)
-	buildContext := context.CreateBuildContext(commandContext)
+	commandContext := contexts.CreateCommandContext(usage)
+	buildContext := contexts.CreateBuildContext(commandContext)
 
-	allFiles := files.GetFilesFromImportSpec(buildContext, commandContext.ImportSpec)
+	allFiles := files.Files(buildContext, commandContext.ImportSpec)
 
-	_ = packages.GetPackagesFromFileList(allFiles)
+	//	allFiles.ForEach(func(key string, value ps.Any) {
+	//		log.Printf("%s: %#v", key, value)
+	//	})
 
+	datafile := datafiles.NewDataFile("com.bunniesandbeatings.go-flavor")
+
+	allFiles.ForEach(func(importPath string, files Any) {
+		module := datafiles.Module{
+			Name: importPath,
+			Id: importPath,
+			Type: "package",
+		}
+		
+		datafile.Modules = append(datafile.Modules, module)
+		log.Printf("%s:", importPath)
+
+		for _, file := range files.([]*ast.File) {
+			log.Printf("\t%#v:", *file)
+		}
+
+	})
+
+	ioutil.WriteFile(commandContext.OutputPath, datafile.ToXML(), 0644)
+
+	fmt.Printf("Output written to '%s'\n", commandContext.OutputPath)
+	//	_ = packages.Packages(allFiles)
 }

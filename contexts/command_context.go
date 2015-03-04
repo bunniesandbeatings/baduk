@@ -1,4 +1,4 @@
-package context
+package contexts
 
 import (
 	"log"
@@ -26,7 +26,7 @@ func CreateCommandContext(usage func()) CommandContext {
 
 	commandContext.ImportSpec = flag.Arg(0)
 
-	log.Printf("Ran with arguments: %s\n", os.Args)
+	log.Printf("Command context: %s\n", os.Args)
 
 	return commandContext
 }
