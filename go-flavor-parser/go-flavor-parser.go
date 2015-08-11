@@ -31,9 +31,9 @@ type BFakeInterface interface {
 }
 
 type FileNode struct {
-	PublicStructs []string
+	PublicStructs    []string
 	PublicInterfaces []string
-	PublicFuncs []string
+	PublicFuncs      []string
 }
 
 
@@ -63,26 +63,27 @@ func (visitor DumpVisitor) Visit(node Node) Visitor {
 
 
 type TypeSpecVisitor struct {
-	File *FileNode
+	File     *FileNode
 	TypeSpec *TypeSpec
 }
 
-
 func (visitor TypeSpecVisitor) Visit(node Node) Visitor {
+	// TODO: Can types be private?
+
 	switch node.(type) {
 	case *InterfaceType:
 		visitor.File.PublicInterfaces = append(visitor.File.PublicInterfaces, visitor.TypeSpec.Name.Name)
 	case *StructType:
 		visitor.File.PublicStructs = append(visitor.File.PublicStructs, visitor.TypeSpec.Name.Name)
 	}
-  return nil
+	return nil
 }
 
-type SpecVisitor struct {
+type GenDeclVisitor struct {
 	File *FileNode
 }
 
-func (visitor SpecVisitor) Visit(node Node) Visitor {
+func (visitor GenDeclVisitor) Visit(node Node) Visitor {
 	switch t := node.(type) {
 	case *TypeSpec:
 		return TypeSpecVisitor{
@@ -93,15 +94,22 @@ func (visitor SpecVisitor) Visit(node Node) Visitor {
 	return nil
 }
 
-type DeclVisitor struct {
+type RootVisitor struct {
 	File *FileNode
 }
 
-func (visitor DeclVisitor) Visit(node Node) Visitor {
-	switch node.(type) {
+func (visitor RootVisitor) Visit(node Node) Visitor {
+	switch t := node.(type) {
 	case *GenDecl:
-		return SpecVisitor{
+		return GenDeclVisitor{
 			File: visitor.File,
+		}
+	case *FuncDecl:
+		// TODO: filter public only
+		if t.Recv == nil {
+			visitor.File.PublicFuncs = append(visitor.File.PublicFuncs, t.Name.Name)
+		} else {
+			// queue function with receiver
 		}
 	}
 	return visitor
@@ -143,7 +151,7 @@ func updateASTWithPackage(pkg *build.Package, ast *PathNode) {
 		filepath := pkg.Dir + "/" + filename
 		astFile, err := parser.ParseFile(fset, filepath, nil, 0)
 
-//		spew.Dump(astFile)
+		spew.Dump(astFile)
 
 		if err != nil {
 			log.Printf("Error %s when parsing file %s\n", err, filepath)
@@ -151,7 +159,7 @@ func updateASTWithPackage(pkg *build.Package, ast *PathNode) {
 		} else {
 			currentNode.FileChildren[filename] = &FileNode{}
 
-			Walk(DeclVisitor{ File: currentNode.FileChildren[filename] }, astFile)
+			Walk(RootVisitor{File: currentNode.FileChildren[filename] }, astFile)
 
 		}
 
