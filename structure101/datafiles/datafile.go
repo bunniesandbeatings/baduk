@@ -40,5 +40,6 @@ func (dataFile *DataFile) ToXML() []byte {
 	if err != nil {
 		fmt.Printf("error when Marshalling Data File definition: %v\n", err)
 	}
+	
 	return dataFileXML
 }

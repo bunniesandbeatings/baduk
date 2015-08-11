@@ -1,54 +1,80 @@
 package files
 
 import (
-	"github.com/mndrix/ps"
-	"github.com/bunniesandbeatings/gotool"
-
-	"strings"
-	"log"
+	"fmt"
+	"go/ast"
 	"go/build"
+	"go/parser"
+	"go/token"
+	"log"
+
+	"github.com/bunniesandbeatings/gotool"
+	"github.com/mndrix/ps"
+	"github.com/davecgh/go-spew/spew"
 )
 
-func GetFilesFromImportSpec(buildContext build.Context, importSpec string) []string {
-	gotool.SetContext(buildContext)
-	importPaths := gotool.ImportPaths([]string{importSpec})
+func Files(buildContext build.Context, importSpec string) ps.Map {
+	importPaths := importPaths(buildContext, importSpec)
 
-	visitedPackages := ps.NewMap()
-	_, files := getFilesFromImportPaths(buildContext, visitedPackages, importPaths)
+	fmt.Println(">>>> DEBUG: ImportPaths")
+	spew.Dump(importPaths)
+	fmt.Println("<<<< DEBUG: ImportPaths\n\n")
 
-	log.Printf("\n*** Files to process ***\n  %#s\n\n", strings.Join(files, "\n  "))
+	files := ps.NewMap()
+	files = filesFromImportPaths(buildContext, files, importPaths)
 
 	return files
 }
 
-func getFilesFromImportPaths(buildContext build.Context, visitedPackages ps.Map, importPaths []string) (newVisitedPackages ps.Map, files []string) {
+func importPaths(buildContext build.Context, importSpec string) []string {
+	gotool.SetContext(buildContext)
+	return gotool.ImportPaths([]string{importSpec})
+}
+
+func filesFromImportPaths(buildContext build.Context, filesByImportPath ps.Map, importPaths []string) (newFilesByImportPath ps.Map) {
+	fset := token.NewFileSet()
+
+	newFilesByImportPath = filesByImportPath
+
 	for _, importPath := range importPaths {
-		if _, found := visitedPackages.Lookup(importPath); !found {
+
+		if _, found := newFilesByImportPath.Lookup(importPath); !found {
+			fmt.Println("DEBUG: Handling path: %s", importPath)
 			buildPackage, err := buildContext.Import(importPath, ".", 0)
 
-			visitedPackages = visitedPackages.Set(importPath, new(ps.Any))
-
-			if err == nil {
-				files = mergeFiles(files, buildPackage.Dir, buildPackage.GoFiles)
-
-				newVisitedPackages, filesFromImports := getFilesFromImportPaths(buildContext, visitedPackages, buildPackage.Imports)
-
-				visitedPackages = newVisitedPackages
-
-				files = append(files, filesFromImports...)
+			if err != nil {
+				log.Print(fmt.Sprintf("WARNING: Could not get file list for '%s', import failed with: %s", importPath, err))
+				newFilesByImportPath = newFilesByImportPath.Set(importPath, []*ast.File{})
 			} else {
-				log.Printf("WARNING: could not get file list for '%s', go/build#import failed with: %s", importPath, err)
+				files := mergeFiles(buildPackage.Dir, buildPackage.GoFiles)
+
+				asts := []*ast.File{}
+
+				for _, filename := range files {
+					fileAst, err := parser.ParseFile(fset, filename, nil, parser.ImportsOnly)
+
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					asts = append(asts, fileAst)
+				}
+
+				newFilesByImportPath = newFilesByImportPath.Set(importPath, asts)
+
+				newFilesByImportPath = filesFromImportPaths(buildContext, newFilesByImportPath, buildPackage.Imports)
 			}
 		}
 	}
 
-	return visitedPackages, files
+	return
 }
 
-func mergeFiles(filesWithPaths []string, importPath string, files []string) (newFilesWithPaths []string) {
+func mergeFiles(importPath string, files []string) (filesWithPaths []string) {
+	filesWithPaths = []string{}
 	for _, filename := range files {
 		filesWithPaths = append(filesWithPaths, importPath+"/"+filename)
 	}
 
-	return filesWithPaths
+	return
 }

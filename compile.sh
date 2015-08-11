@@ -1,3 +1,0 @@
-mkdir -p final
-go get -v ./...
-go build -race -o final/parser github.com/bunniesandbeatings/go-flavor-parser/go-flavor-parser
