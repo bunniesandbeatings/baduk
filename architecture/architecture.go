@@ -1,4 +1,5 @@
 package architecture
+
 import "strings"
 
 type Architecture struct {

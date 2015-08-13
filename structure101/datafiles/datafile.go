@@ -26,8 +26,7 @@ type DataFile struct {
 	Dependencies []Dependency
 }
 
-
-func NewDataFile(flavorName string) *DataFile{
+func NewDataFile(flavorName string) *DataFile {
 	return &DataFile{
 		Flavor:       flavorName,
 		Modules:      []Module{},
@@ -40,6 +39,6 @@ func (dataFile *DataFile) ToXML() []byte {
 	if err != nil {
 		fmt.Printf("error when Marshalling Data File definition: %v\n", err)
 	}
-	
+
 	return dataFileXML
 }

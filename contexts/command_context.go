@@ -1,8 +1,8 @@
 package contexts
 
 import (
-	"log"
 	"flag"
+	"log"
 	"os"
 )
 

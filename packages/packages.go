@@ -1,9 +1,9 @@
 package packages
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
-	"go/ast"
 	"log"
 )
 
@@ -25,7 +25,7 @@ func Packages(files []string) map[string]*ast.Package {
 
 func ParseFiles(fset *token.FileSet, files []string, mode parser.Mode) (pkgs map[string]*ast.Package, first error) {
 	pkgs = make(map[string]*ast.Package)
-	
+
 	for _, filename := range files {
 		if src, err := parser.ParseFile(fset, filename, nil, mode); err == nil {
 			name := src.Name.Name

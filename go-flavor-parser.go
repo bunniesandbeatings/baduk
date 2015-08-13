@@ -5,12 +5,10 @@ import (
 
 	"flag"
 	"fmt"
-	"go/build"
 	"log"
 	"os"
 	"runtime/debug"
 
-	"github.com/bunniesandbeatings/gotool"
 	"github.com/davecgh/go-spew/spew"
 
 	"github.com/bunniesandbeatings/go-flavor-parser/parser"
@@ -22,11 +20,6 @@ func usage() {
 	log.Printf("\t%s [flags] packages # see 'go help packages'\n", appName)
 	log.Printf("Flags:\n")
 	flag.PrintDefaults()
-}
-
-func importPaths(buildContext build.Context, importSpec string) []string {
-	gotool.SetContext(buildContext)
-	return gotool.ImportPaths([]string{importSpec})
 }
 
 func main() {
@@ -41,13 +34,9 @@ func main() {
 	commandContext := contexts.CreateCommandContext(usage)
 	buildContext := contexts.CreateBuildContext(commandContext)
 
-	importPaths := importPaths(buildContext, commandContext.ImportSpec)
-
 	parser := parser.NewParser(buildContext)
 
-	for _, importPath := range importPaths {
-		parser.ParseImport(importPath)
-	}
+	parser.ParseImportSpec(commandContext.ImportSpec)
 
 	fmt.Println(">>>> DEBUG: ast")
 	spew.Dump(parser.Arch)
