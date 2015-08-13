@@ -1,20 +1,33 @@
 package ast
 
-type FileNode struct {
+type File struct {
 	PublicStructs    []string
 	PublicInterfaces []string
 	PublicFuncs      []string
 }
 
-type PathNode struct {
-	PathChildren map[string]*PathNode
-	FileChildren map[string]*FileNode
+func NewFile() *File {
+	return &File{}
 }
 
-func NewPathNode() *PathNode {
-	return &PathNode{
-		PathChildren: make(map[string]*PathNode),
+type Directory struct {
+	Directories map[string]*Directory
+	Files map[string]*File
+}
+
+func NewDirectory() *Directory {
+	return &Directory{
+		Directories: make(map[string]*Directory),
+		Files: make(map[string]*File),
 	}
 }
 
+type AST struct {
+	Root *Directory
+}
 
+func NewAST() *AST {
+	return &AST{
+		Root: NewDirectory(),
+	}
+}

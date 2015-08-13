@@ -40,19 +40,17 @@ func main() {
 	}()
 
 	commandContext := contexts.CreateCommandContext(usage)
-
 	buildContext := contexts.CreateBuildContext(commandContext)
-
-	ast := target.NewPathNode()
-
 	importPaths := importPaths(buildContext, commandContext.ImportSpec)
+
+	ast := target.NewAST()
 
 	for _, importPath := range importPaths {
 		fmt.Println(importPath)
 
 		buildPackage, _ := buildContext.Import(importPath, ".", 0)
 
-		parser.UpdateFromPackage(buildPackage, ast)
+		parser.UpdateFromPackage(buildPackage, ast.Root)
 	}
 
 	fmt.Println(">>>> DEBUG: ast")

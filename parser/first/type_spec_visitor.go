@@ -6,7 +6,7 @@ import (
 )
 
 type TypeSpecVisitor struct {
-	File     *target.FileNode
+	File     *target.File
 	TypeSpec *ast.TypeSpec
 }
 

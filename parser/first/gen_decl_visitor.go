@@ -7,7 +7,7 @@ import (
 
 
 type GenDeclVisitor struct {
-	File *target.FileNode
+	File *target.File
 }
 
 func (visitor GenDeclVisitor) Visit(node ast.Node) ast.Visitor {

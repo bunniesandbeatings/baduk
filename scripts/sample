@@ -4,4 +4,8 @@ set -eo pipefail
 
 ./scripts/compile
 
+echo
+echo "***** RUNNING"
+echo
+
 final/parser -output final/output.xml github.com/bunniesandbeatings/go-flavor-parser/...
