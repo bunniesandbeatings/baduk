@@ -1,8 +1,7 @@
 package parser
 import (
 	"go/build"
-	. "github.com/bunniesandbeatings/go-flavor-parser/ast"
-	"strings"
+	. "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"go/token"
 	"go/parser"
 	"log"
@@ -11,10 +10,10 @@ import (
 	"path/filepath"
 )
 
-func UpdateFromPackage(pkg *build.Package, root *Directory) {
+func UpdateFromPackage(pkg *build.Package, arch *Architecture) {
 	fset := token.NewFileSet()
 
-	dir := getOrCreateDirectory(pkg.ImportPath, root)
+	dir := arch.FindDirectory(pkg.ImportPath)
 
 //	receiverFunctions = make()
 
@@ -36,18 +35,3 @@ func UpdateFromPackage(pkg *build.Package, root *Directory) {
 	}
 }
 
-func getOrCreateDirectory(path string, root *Directory) *Directory {
-	pathSections := strings.Split(path, "/")
-
-	currentNode := root
-
-	for _, pathSection := range pathSections {
-		if _, found := currentNode.Directories[pathSection]; !found {
-			currentNode.Directories[pathSection] = NewDirectory()
-		}
-
-		currentNode = currentNode.Directories[pathSection]
-	}
-
-	return currentNode
-}

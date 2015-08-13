@@ -1,7 +1,7 @@
 package first
 
 import (
-	target "github.com/bunniesandbeatings/go-flavor-parser/ast"
+	target "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"go/ast"
 )
 
