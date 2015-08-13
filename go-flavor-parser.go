@@ -46,7 +46,6 @@ func main() {
 	parser := parser.NewParser(buildContext)
 
 	for _, importPath := range importPaths {
-
 		parser.ParseImport(importPath)
 	}
 
