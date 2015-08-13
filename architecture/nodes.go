@@ -22,12 +22,3 @@ func NewDirectory() *Directory {
 	}
 }
 
-type AST struct {
-	Root *Directory
-}
-
-func NewAST() *AST {
-	return &AST{
-		Root: NewDirectory(),
-	}
-}
