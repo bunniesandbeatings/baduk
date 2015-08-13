@@ -10,7 +10,6 @@ import (
 	"os"
 	"runtime/debug"
 
-	target "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"github.com/bunniesandbeatings/gotool"
 	"github.com/davecgh/go-spew/spew"
 
@@ -41,20 +40,18 @@ func main() {
 
 	commandContext := contexts.CreateCommandContext(usage)
 	buildContext := contexts.CreateBuildContext(commandContext)
+
 	importPaths := importPaths(buildContext, commandContext.ImportSpec)
 
-	arch := target.NewArchitecture()
+	parser := parser.NewParser(buildContext)
 
 	for _, importPath := range importPaths {
-		fmt.Println(importPath)
 
-		buildPackage, _ := buildContext.Import(importPath, ".", 0)
-
-		parser.UpdateFromPackage(buildPackage, arch)
+		parser.ParseImport(importPath)
 	}
 
 	fmt.Println(">>>> DEBUG: ast")
-	spew.Dump(arch)
+	spew.Dump(parser.Arch)
 	fmt.Println("<<<< DEBUG: ast\n\n")
 
 	//	datafile := datafiles.NewDataFile("com.bunniesandbeatings.go-flavor")

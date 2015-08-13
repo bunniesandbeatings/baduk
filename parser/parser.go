@@ -3,23 +3,43 @@ import (
 	"go/build"
 	. "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"go/token"
-	"go/parser"
+	goparser "go/parser"
 	"log"
 	"go/ast"
 	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
 	"path/filepath"
 )
 
-func UpdateFromPackage(pkg *build.Package, arch *Architecture) {
+type Parser struct {
+	Arch *Architecture
+	Context build.Context
+}
+
+func NewParser(context build.Context) *Parser {
+	return &Parser{
+		Arch: NewArchitecture(),
+		Context: context,
+	}
+}
+
+func (parser *Parser) ParseImport(importPath string) {
+	log.Printf("Parsing import path: %s", importPath)
+
+	buildPackage, _ := parser.Context.Import(importPath, ".", 0)
+
+	parser.updateFromPackage(buildPackage)
+}
+
+func (parser *Parser) updateFromPackage(pkg *build.Package) {
 	fset := token.NewFileSet()
 
-	dir := arch.FindDirectory(pkg.ImportPath)
+	dir := parser.Arch.FindDirectory(pkg.ImportPath)
 
 //	receiverFunctions = make()
 
 	for _, filename := range pkg.GoFiles {
 		filepath := filepath.Join(pkg.Dir + "/" + filename)
-		astFile, err := parser.ParseFile(fset, filepath, nil, 0)
+		astFile, err := goparser.ParseFile(fset, filepath, nil, 0)
 
 //		spew.Dump(astFile)
 
