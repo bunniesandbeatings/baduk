@@ -13,21 +13,25 @@ import (
 )
 
 type Parser struct {
-	Arch    *arch.Architecture
-	Context build.Context
+	arch    *arch.Architecture
+	context build.Context
 	fset    *token.FileSet
 }
 
 func NewParser(context build.Context) *Parser {
 	return &Parser{
-		Arch:    arch.NewArchitecture(),
-		Context: context,
+		arch:    arch.NewArchitecture(),
+		context: context,
 		fset: token.NewFileSet(),
 	}
 }
 
+func (parser Parser) GetArchitecture() arch.Architecture {
+	return *parser.arch
+}
+
 func (parser *Parser) ParseImportSpec(spec string) {
-	gotool.SetContext(parser.Context)
+	gotool.SetContext(parser.context)
 	importPaths := gotool.ImportPaths([]string{spec})
 
 	for _, importPath := range importPaths {
@@ -38,13 +42,13 @@ func (parser *Parser) ParseImportSpec(spec string) {
 func (parser *Parser) parseImport(importPath string) {
 	log.Printf("Parsing import path: %s", importPath)
 
-	buildPackage, _ := parser.Context.Import(importPath, ".", 0)
+	buildPackage, _ := parser.context.Import(importPath, ".", 0)
 
 	parser.parsePackage(buildPackage)
 }
 
 func (parser *Parser) parsePackage(pkg *build.Package) {
-	dirNode := parser.Arch.FindDirectory(pkg.ImportPath)
+	dirNode := parser.arch.FindDirectory(pkg.ImportPath)
 
 	for _, filename := range pkg.GoFiles {
 		parser.parseGoFile(dirNode, pkg.Dir, filename)

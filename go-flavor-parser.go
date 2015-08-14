@@ -40,7 +40,7 @@ func main() {
 	parser.ParseImportSpec(commandContext.ImportSpec)
 
 	fmt.Println(">>>> DEBUG: ast")
-	spew.Dump(parser.Arch)
+	spew.Dump(parser.GetArchitecture())
 	fmt.Println("<<<< DEBUG: ast\n\n")
 
 	//	datafile := datafiles.NewDataFile("com.bunniesandbeatings.go-flavor")
