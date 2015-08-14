@@ -2,13 +2,19 @@ package first
 
 import (
 	"fmt"
-	target "github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"github.com/davecgh/go-spew/spew"
 	"go/ast"
 )
 
 type RootVisitor struct {
-	File *target.File
+	File *arch.File
+}
+
+func NewRootVisitor(file *arch.File) RootVisitor{
+  return RootVisitor{
+		File: file,
+	}
 }
 
 func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
@@ -29,3 +35,4 @@ func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
 	}
 	return visitor
 }
+

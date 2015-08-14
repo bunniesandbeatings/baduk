@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/bunniesandbeatings/go-flavor-parser/contexts"
+	"github.com/bunniesandbeatings/go-flavor-parser/parser"
 
 	"flag"
 	"fmt"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/bunniesandbeatings/go-flavor-parser/parser"
 )
 
 func usage() {
@@ -23,6 +23,7 @@ func usage() {
 }
 
 func main() {
+
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
