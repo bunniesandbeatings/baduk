@@ -15,9 +15,9 @@ func (visitor TypeSpecVisitor) Visit(node ast.Node) ast.Visitor {
 
 	switch node.(type) {
 	case *ast.InterfaceType:
-		visitor.File.PublicInterfaces = append(visitor.File.PublicInterfaces, visitor.TypeSpec.Name.Name)
+		visitor.File.AddInterface(visitor.TypeSpec.Name.Name)
 	case *ast.StructType:
-		visitor.File.PublicStructs = append(visitor.File.PublicStructs, visitor.TypeSpec.Name.Name)
+		visitor.File.AddStruct(visitor.TypeSpec.Name.Name)
 	}
 	return nil
 }

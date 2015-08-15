@@ -1,19 +1,9 @@
 package architecture
 
-import (
-	"go/token"
-)
-
-type File struct {
-	PublicStructs    []string
-	PublicInterfaces []string
-	PublicFuncs      []string
-}
-
 type Directory struct {
 	Directories map[string]*Directory
+	Package     string
 	Files       map[string]*File
-	Fset        token.FileSet
 }
 
 func newDirectory() *Directory {

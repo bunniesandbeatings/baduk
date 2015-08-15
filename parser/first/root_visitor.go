@@ -2,19 +2,13 @@ package first
 
 import (
 	"fmt"
-	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
-	"github.com/davecgh/go-spew/spew"
 	"go/ast"
+
+	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 )
 
 type RootVisitor struct {
 	File *arch.File
-}
-
-func NewRootVisitor(file *arch.File) RootVisitor{
-  return RootVisitor{
-		File: file,
-	}
 }
 
 func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
@@ -26,13 +20,28 @@ func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
 	case *ast.FuncDecl:
 		// TODO: filter public only
 		if t.Recv == nil {
-			visitor.File.PublicFuncs = append(visitor.File.PublicFuncs, t.Name.Name)
+			visitor.File.AddFunc(t.Name.Name)
 		} else {
-			spew.Dump(t.Recv)
-			fmt.Printf("(rcvr %v) func %s()\n\n", t.Recv.List[0].Type, t.Name.Name)
-			// queue function with receiver
+			receiverType := getReceiverType(t.Recv)
+
+			fmt.Printf("(rcvr %s) func %s()\n\n", receiverType, t.Name.Name)
 		}
 	}
 	return visitor
 }
 
+func getReceiverType(receiver *ast.FieldList) string {
+	switch receiverType := receiver.List[0].Type.(type) {
+
+	case *ast.StarExpr:
+		return receiverType.X.(*ast.Ident).Name
+
+	case *ast.Ident:
+		return receiverType.Name
+
+	default:
+		panic(fmt.Sprintf("Cannot Parse receiver: %v", receiver))
+	}
+
+	return ""
+}

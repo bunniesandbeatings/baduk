@@ -1,15 +1,16 @@
 package parser
 
 import (
+	"fmt"
 	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
 	"github.com/bunniesandbeatings/gotool"
+	"go/ast"
 	"go/build"
+	goparser "go/parser"
 	"go/token"
 	"log"
 	"path/filepath"
-	goparser "go/parser"
-	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
-	"go/ast"
 )
 
 type Parser struct {
@@ -22,7 +23,7 @@ func NewParser(context build.Context) *Parser {
 	return &Parser{
 		arch:    arch.NewArchitecture(),
 		context: context,
-		fset: token.NewFileSet(),
+		fset:    token.NewFileSet(),
 	}
 }
 
@@ -58,6 +59,8 @@ func (parser *Parser) parsePackage(pkg *build.Package) {
 func (parser *Parser) parseGoFile(dir *arch.Directory, path string, filename string) {
 	filepath := filepath.Join(path, filename)
 
+//	packageMaps := PackageMaps{}
+
 	astFile, err := goparser.ParseFile(parser.fset, filepath, nil, 0)
 	if err != nil {
 		log.Printf("WARNING: Error %s when parsing file %s\n", err, filepath)
@@ -65,9 +68,20 @@ func (parser *Parser) parseGoFile(dir *arch.Directory, path string, filename str
 		return
 	}
 
-	dir.Files[filename] = &arch.File{}
-	//		spew.Dump(astFile)
+	packageName := astFile.Name.Name
 
-	rootVisitor := first.NewRootVisitor(dir.Files[filename])
+	if dir.Package == "" {
+		dir.Package = packageName
+	} else if dir.Package != packageName {
+		panic(fmt.Sprintf("File %s package %s conflicts with %s", filepath, packageName, dir.Package))
+	}
+
+	file := &arch.File{}
+
+	dir.Files[filename] = file
+
+	//	spew.Dump(astFile)
+
+	rootVisitor := first.RootVisitor{File: file}
 	ast.Walk(rootVisitor, astFile)
 }

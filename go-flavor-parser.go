@@ -11,7 +11,6 @@ import (
 	"runtime/debug"
 
 	"github.com/davecgh/go-spew/spew"
-
 )
 
 func usage() {
@@ -39,9 +38,7 @@ func main() {
 
 	parser.ParseImportSpec(commandContext.ImportSpec)
 
-	fmt.Println(">>>> DEBUG: ast")
-	spew.Dump(parser.GetArchitecture())
-	fmt.Println("<<<< DEBUG: ast\n\n")
+	log.Println(spew.Sdump(parser.GetArchitecture()))
 
 	//	datafile := datafiles.NewDataFile("com.bunniesandbeatings.go-flavor")
 	//
