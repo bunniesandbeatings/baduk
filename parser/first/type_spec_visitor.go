@@ -1,13 +1,19 @@
 package first
 
 import (
-	target "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 	"go/ast"
 )
 
 type TypeSpecVisitor struct {
-	File     *target.File
+	Context
 	TypeSpec *ast.TypeSpec
+}
+
+func NewTypeSpecVisitor(context Context, typeSpec *ast.TypeSpec) *TypeSpecVisitor {
+	return &TypeSpecVisitor{
+		context,
+		typeSpec,
+	}
 }
 
 func (visitor TypeSpecVisitor) Visit(node ast.Node) ast.Visitor {
@@ -15,9 +21,9 @@ func (visitor TypeSpecVisitor) Visit(node ast.Node) ast.Visitor {
 
 	switch node.(type) {
 	case *ast.InterfaceType:
-		visitor.File.AddInterface(visitor.TypeSpec.Name.Name)
+		visitor.Package.AddInterface(visitor.TypeSpec.Name.Name, visitor.Filename)
 	case *ast.StructType:
-		visitor.File.AddStruct(visitor.TypeSpec.Name.Name)
+		visitor.Package.AddStruct(visitor.TypeSpec.Name.Name, visitor.Filename)
 	}
 	return nil
 }

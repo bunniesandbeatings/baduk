@@ -3,24 +3,24 @@ package first
 import (
 	"fmt"
 	"go/ast"
-
-	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
 )
 
 type RootVisitor struct {
-	File *arch.File
+	Context
+}
+
+func NewRootVisitor(context Context) *RootVisitor {
+	return &RootVisitor{context}
 }
 
 func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
 	switch t := node.(type) {
 	case *ast.GenDecl:
-		return GenDeclVisitor{
-			File: visitor.File,
-		}
+		return NewGenDeclVisitor(visitor.Context)
 	case *ast.FuncDecl:
 		// TODO: filter public only
 		if t.Recv == nil {
-			visitor.File.AddFunc(t.Name.Name)
+			visitor.Package.AddFunc(t.Name.Name, visitor.Filename)
 		} else {
 			receiverType := getReceiverType(t.Recv)
 

@@ -1,14 +1,22 @@
 package architecture
 
-type File struct {
-	Structs []*Struct
+type Package struct {
+	Name       string
+	Structs    []*Struct
 	Interfaces []*Interface
-	Funcs []*Func
+	Funcs      []*Func
 }
 
-func (file *File) AddFunc(name string) (function *Func) {
-	function = &Func{
+func NewPackage(name string) *Package {
+	return &Package{
 		Name: name,
+	}
+}
+
+func (file *Package) AddFunc(name string, filename string) (function *Func) {
+	function = &Func{
+		Name:     name,
+		Filename: filename,
 	}
 
 	file.Funcs = append(file.Funcs, function)
@@ -16,9 +24,10 @@ func (file *File) AddFunc(name string) (function *Func) {
 	return
 }
 
-func (file *File) AddInterface(name string) (iface *Interface) {
+func (file *Package) AddInterface(name string, filename string) (iface *Interface) {
 	iface = &Interface{
-		Name: name,
+		Name:     name,
+		Filename: filename,
 	}
 
 	file.Interfaces = append(file.Interfaces, iface)
@@ -26,9 +35,10 @@ func (file *File) AddInterface(name string) (iface *Interface) {
 	return
 }
 
-func (file *File) AddStruct(name string) (structure *Struct) {
+func (file *Package) AddStruct(name string, filename string) (structure *Struct) {
 	structure = &Struct{
-		Name: name,
+		Name:     name,
+		Filename: filename,
 	}
 
 	file.Structs = append(file.Structs, structure)

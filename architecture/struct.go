@@ -1,5 +1,6 @@
 package architecture
 
 type Struct struct {
-	Name        string
+	Name     string
+	Filename string
 }

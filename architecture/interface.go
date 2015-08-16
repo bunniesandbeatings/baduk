@@ -1,5 +1,6 @@
 package architecture
 
 type Interface struct {
-	Name string
+	Name     string
+	Filename string
 }

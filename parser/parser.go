@@ -2,15 +2,16 @@ package parser
 
 import (
 	"fmt"
-	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
-	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
-	"github.com/bunniesandbeatings/gotool"
 	"go/ast"
 	"go/build"
 	goparser "go/parser"
 	"go/token"
 	"log"
 	"path/filepath"
+
+	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
+	"github.com/bunniesandbeatings/gotool"
 )
 
 type Parser struct {
@@ -56,32 +57,31 @@ func (parser *Parser) parsePackage(pkg *build.Package) {
 	}
 }
 
-func (parser *Parser) parseGoFile(dir *arch.Directory, path string, filename string) {
+func (parser *Parser) parseGoFile(directory *arch.Directory, path string, filename string) {
 	filepath := filepath.Join(path, filename)
+	astFile := parser.getASTFile(filepath)
+	//	spew.Dump(astFile)
 
-//	packageMaps := PackageMaps{}
+	pkg, err := directory.CreatePackage(astFile.Name.Name)
+	if err != nil {
+		panic(fmt.Sprintf("File %s package %s conflicts with %s", filepath, astFile.Name.Name, directory.Package))
+	}
 
+	visitorContext := first.Context{
+		Package:  pkg,
+		Filename: filename,
+	}
+
+	rootVisitor := first.NewRootVisitor(visitorContext)
+
+	ast.Walk(rootVisitor, astFile)
+}
+
+func (parser *Parser) getASTFile(filepath string) (astFile *ast.File) {
 	astFile, err := goparser.ParseFile(parser.fset, filepath, nil, 0)
 	if err != nil {
 		log.Printf("WARNING: Error %s when parsing file %s\n", err, filepath)
-		dir.Files[filename] = nil
-		return
+		astFile = nil
 	}
-
-	packageName := astFile.Name.Name
-
-	if dir.Package == "" {
-		dir.Package = packageName
-	} else if dir.Package != packageName {
-		panic(fmt.Sprintf("File %s package %s conflicts with %s", filepath, packageName, dir.Package))
-	}
-
-	file := &arch.File{}
-
-	dir.Files[filename] = file
-
-	//	spew.Dump(astFile)
-
-	rootVisitor := first.RootVisitor{File: file}
-	ast.Walk(rootVisitor, astFile)
+	return
 }

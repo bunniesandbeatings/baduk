@@ -1,5 +1,6 @@
 package architecture
 
 type Func struct {
-	Name string
+	Name     string
+	Filename string
 }

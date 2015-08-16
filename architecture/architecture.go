@@ -8,7 +8,7 @@ type Architecture struct {
 
 func NewArchitecture() *Architecture {
 	return &Architecture{
-		Root: newDirectory(),
+		Root: NewDirectory(),
 	}
 }
 
@@ -19,7 +19,7 @@ func (arch *Architecture) FindDirectory(path string) *Directory {
 
 	for _, pathSection := range pathSections {
 		if _, found := currentNode.Directories[pathSection]; !found {
-			currentNode.Directories[pathSection] = newDirectory()
+			currentNode.Directories[pathSection] = NewDirectory()
 		}
 
 		currentNode = currentNode.Directories[pathSection]
