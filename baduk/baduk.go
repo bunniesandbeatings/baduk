@@ -5,10 +5,8 @@ import (
 	"github.com/bunniesandbeatings/go-flavor-parser/parser"
 
 	"flag"
-	"fmt"
 	"log"
 	"os"
-	"runtime/debug"
 
 	"github.com/davecgh/go-spew/spew"
 )
@@ -23,13 +21,13 @@ func usage() {
 
 func main() {
 
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
-			debug.PrintStack()
-			os.Exit(1)
-		}
-	}()
+	//	defer func() {
+	//		if err := recover(); err != nil {
+	//			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
+	//			debug.PrintStack()
+	//			os.Exit(1)
+	//		}
+	//	}()
 
 	commandContext := contexts.CreateCommandContext(usage)
 	buildContext := contexts.CreateBuildContext(commandContext)

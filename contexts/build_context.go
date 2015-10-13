@@ -1,11 +1,6 @@
 package contexts
 
-import (
-	"github.com/tonnerre/golang-pretty"
-
-	"go/build"
-	"log"
-)
+import "go/build"
 
 func CreateBuildContext(commandContext CommandContext) build.Context {
 	buildContext := build.Default
@@ -18,7 +13,7 @@ func CreateBuildContext(commandContext CommandContext) build.Context {
 		buildContext.GOROOT = commandContext.GoRoot
 	}
 
-	log.Printf("\n*** Build Context ***\n%# v\n\n", pretty.Formatter(buildContext))
+	//	log.Printf("\n*** Build Context ***\n%# v\n\n", pretty.Formatter(buildContext))
 
 	return buildContext
 }
