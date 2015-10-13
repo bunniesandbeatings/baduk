@@ -2,11 +2,12 @@ package pretty
 
 import (
 	"fmt"
-	"github.com/kr/text"
 	"io"
 	"reflect"
 	"strconv"
 	"text/tabwriter"
+
+	"github.com/kr/text"
 )
 
 const (
