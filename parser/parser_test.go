@@ -58,7 +58,19 @@ func TestParseInterfaceMethod(t *testing.T) {
 }
 
 func TestParseMethodOfInterface(t *testing.T) {
-	method := findMethod(t, "MethodOfInterface", parseTypesMethods(t))
+	ifaces := parseTypesInterfaces(t)
+	if len(ifaces) != 1 {
+		t.Errorf("Unexpected number of interfaces: %d", len(ifaces))
+	}
+	methods := ifaces[0].Methods
+	if len(methods) != 2 {
+		t.Errorf("Unexpected number of methods: %d", len(methods))
+	}
+
+	method := findMethod(t, "MethodOfInterface", methods)
+	checkFuncShape(t, 0, 0, method)
+
+	method = findMethod(t, "AnotherMethodOfInterface", methods)
 	checkFuncShape(t, 0, 0, method)
 }
 
@@ -82,7 +94,7 @@ func TestParseEllipsisMethod(t *testing.T) {
 	checkParmTypes(t, method, "...int")
 }
 
-func parseTypesMethods(t *testing.T) []*architecture.Method {
+func parseTypesPackage(t *testing.T) *architecture.Package {
 	pwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +106,15 @@ func parseTypesMethods(t *testing.T) []*architecture.Method {
 
 	p.ParseImportSpec("test_types")
 	arch := p.GetArchitecture()
-	return arch.FindDirectory("test_types").Package.Methods
+	return arch.FindDirectory("test_types").Package
+}
+
+func parseTypesMethods(t *testing.T) []*architecture.Method {
+	return parseTypesPackage(t).Methods
+}
+
+func parseTypesInterfaces(t *testing.T) []*architecture.Interface {
+	return parseTypesPackage(t).Interfaces
 }
 
 func findMethod(t *testing.T, name string, methods []*architecture.Method) *architecture.Method {

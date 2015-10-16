@@ -54,15 +54,16 @@ func (file *Package) AddMethod(name string, filename string, receiverType Type, 
 	return
 }
 
-func (file *Package) AddInterface(name string, filename string) (iface *Interface) {
+func (file *Package) AddInterface(name string, filename string, methods []*Method) (iface *Interface) {
 	iface = &Interface{
 		Name:     name,
 		Filename: filename,
+		Methods:  methods,
 	}
 
 	file.Interfaces = append(file.Interfaces, iface)
 
-	return
+	return iface
 }
 
 func (file *Package) AddStruct(name string, filename string) (structure *Struct) {

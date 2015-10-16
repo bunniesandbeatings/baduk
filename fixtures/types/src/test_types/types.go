@@ -45,4 +45,5 @@ func (T) Ellipsis(...int) {
 
 type I interface {
 	MethodOfInterface()
+	AnotherMethodOfInterface()
 }

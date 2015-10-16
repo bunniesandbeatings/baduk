@@ -70,6 +70,10 @@ func typeOf(expr ast.Expr) architecture.Type {
 	case *ast.SelectorExpr:
 		t = architecture.Type(exprType.X.(*ast.Ident).Name + "." + exprType.Sel.Name)
 
+	case *ast.InterfaceType:
+		spew.Printf("Not sure what to do with interface type %#v\n", expr)
+		t = "interface-type-in-root"
+
 	default:
 		panic(spew.Sprintf("Cannot determine type of expression %#v", expr))
 	}
