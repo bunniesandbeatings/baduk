@@ -56,9 +56,10 @@ func (file *Package) AddMethod(name string, filename string, receiverType Type, 
 
 func (file *Package) AddInterface(name string, filename string, methods []*Method) (iface *Interface) {
 	iface = &Interface{
-		Name:     name,
-		Filename: filename,
-		Methods:  methods,
+		Name:         name,
+		Filename:     filename,
+		Methods:      methods,
+		Implementers: []Type{},
 	}
 
 	file.Interfaces = append(file.Interfaces, iface)
