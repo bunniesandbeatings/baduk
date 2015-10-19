@@ -17,7 +17,8 @@ func (parser *Parser) matchInterface(iface *architecture.Interface) {
 			for _, tDir := range parser.arch.Root.Directories {
 				for _, concreteMethod := range tDir.Package.Methods {
 					if matchMethod(method, concreteMethod) {
-						iface.Implementers = append(iface.Implementers, concreteMethod.ReceiverType)
+						implType := architecture.Type(concreteMethod.Package+".") + concreteMethod.ReceiverType
+						iface.Implementers = append(iface.Implementers, implType)
 					}
 				}
 			}

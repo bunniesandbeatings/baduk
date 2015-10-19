@@ -56,6 +56,7 @@ func (visitor TypeSpecVisitor) Visit(node ast.Node) ast.Visitor {
 			method := &architecture.Method{
 				Func: architecture.Func{
 					Name:        field.Names[0].Name,
+					Package:     visitor.Package.Name,
 					Filename:    visitor.Filename,
 					ParmTypes:   parmTypes,
 					ReturnTypes: returnTypes,

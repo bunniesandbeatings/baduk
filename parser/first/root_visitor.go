@@ -28,7 +28,7 @@ func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
 			params := fieldListTypes(t.Type.Params)
 			returns := fieldListTypes(t.Type.Results)
 
-			visitor.Package.AddMethod(t.Name.Name, visitor.Filename, receiverType, params, returns)
+			visitor.Package.AddMethod(t.Name.Name, visitor.Package.Name, visitor.Filename, receiverType, params, returns)
 		}
 	}
 	return visitor
