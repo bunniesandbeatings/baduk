@@ -1,8 +1,10 @@
 package first
 
 import (
-	"fmt"
 	"go/ast"
+
+	"github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	"github.com/davecgh/go-spew/spew"
 )
 
 type RootVisitor struct {
@@ -22,26 +24,59 @@ func (visitor RootVisitor) Visit(node ast.Node) ast.Visitor {
 		if t.Recv == nil {
 			visitor.Package.AddFunc(t.Name.Name, visitor.Filename)
 		} else {
-			receiverType := getReceiverType(t.Recv)
+			receiverType := fieldListTypes(t.Recv)[0]
+			params := fieldListTypes(t.Type.Params)
+			returns := fieldListTypes(t.Type.Results)
 
-			fmt.Printf("(rcvr %s) func %s()\n\n", receiverType, t.Name.Name)
+			visitor.Package.AddMethod(t.Name.Name, visitor.Filename, receiverType, params, returns)
 		}
 	}
 	return visitor
 }
 
-func getReceiverType(receiver *ast.FieldList) string {
-	switch receiverType := receiver.List[0].Type.(type) {
+func fieldListTypes(fl *ast.FieldList) []architecture.Type {
+	types := make([]architecture.Type, 0)
+	if fl != nil {
+		for _, field := range fl.List {
+			types = append(types, typeOf(field.Type))
+		}
+
+	}
+	return types
+}
+
+func typeOf(expr ast.Expr) architecture.Type {
+	var t architecture.Type
+	switch exprType := expr.(type) {
 
 	case *ast.StarExpr:
-		return receiverType.X.(*ast.Ident).Name
+		t = architecture.Type("*") + typeOf(exprType.X)
 
 	case *ast.Ident:
-		return receiverType.Name
+		t = architecture.Type(exprType.Name)
+
+	case *ast.ArrayType:
+		len := exprType.Len
+		if len == nil {
+			t = architecture.Type("[]") + typeOf(exprType.Elt)
+		} else {
+			leng := len.(*ast.BasicLit).Value
+			t = architecture.Type("["+leng+"]") + typeOf(exprType.Elt)
+		}
+
+	case *ast.Ellipsis:
+		t = architecture.Type("...") + typeOf(exprType.Elt)
+
+	case *ast.SelectorExpr:
+		t = architecture.Type(exprType.X.(*ast.Ident).Name + "." + exprType.Sel.Name)
+
+	case *ast.InterfaceType:
+		spew.Printf("Not sure what to do with interface type %#v\n", expr)
+		t = "interface-type-in-root"
 
 	default:
-		panic(fmt.Sprintf("Cannot Parse receiver: %v", receiver))
+		panic(spew.Sprintf("Cannot determine type of expression %#v", expr))
 	}
 
-	return ""
+	return t
 }

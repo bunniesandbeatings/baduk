@@ -42,27 +42,31 @@ func (parser *Parser) ParseImportSpec(spec string) {
 }
 
 func (parser *Parser) parseImport(importPath string) {
-	log.Printf("Parsing import path: %s", importPath)
-
 	buildPackage, _ := parser.context.Import(importPath, ".", 0)
-
 	parser.parsePackage(buildPackage)
 }
 
 func (parser *Parser) parsePackage(pkg *build.Package) {
 	dirNode := parser.arch.FindDirectory(pkg.ImportPath)
 
+	astFiles := make([]*ast.File, 1)
 	for _, filename := range pkg.GoFiles {
-		parser.parseGoFile(dirNode, pkg.Dir, filename)
+		filepath := filepath.Join(pkg.Dir, filename)
+		astFile := parser.getASTFile(filepath)
+		astFiles = append(astFiles, astFile)
+	}
+
+	for _, filename := range pkg.GoFiles {
+		parser.parseGoFile(dirNode, pkg.Dir, filename, astFiles)
 	}
 }
 
-func (parser *Parser) parseGoFile(directory *arch.Directory, path string, filename string) {
+func (parser *Parser) parseGoFile(directory *arch.Directory, path string, filename string, astFiles []*ast.File) {
 	filepath := filepath.Join(path, filename)
 	astFile := parser.getASTFile(filepath)
 	//	spew.Dump(astFile)
 
-	pkg, err := directory.CreatePackage(astFile.Name.Name)
+	pkg, err := directory.CreatePackage(astFile.Name.Name, astFiles)
 	if err != nil {
 		panic(fmt.Sprintf("File %s package %s conflicts with %s", filepath, astFile.Name.Name, directory.Package))
 	}
@@ -70,6 +74,7 @@ func (parser *Parser) parseGoFile(directory *arch.Directory, path string, filena
 	visitorContext := first.Context{
 		Package:  pkg,
 		Filename: filename,
+		Fset:     parser.fset,
 	}
 
 	rootVisitor := first.NewRootVisitor(visitorContext)

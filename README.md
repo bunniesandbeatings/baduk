@@ -12,6 +12,15 @@ go build github.com/bunniesandbeatings/go-flavor-parser
 
 ```
 
+## Test
+
+**Must use go 1.5+**
+
+```
+export GO15VENDOREXPERIMENT=1
+go test github.com/bunniesandbeatings/go-flavor-parser/...
+```
+
 ## Run
 
 Binary is called `baduk`

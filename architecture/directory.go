@@ -2,6 +2,7 @@ package architecture
 
 import (
 	"errors"
+	"go/ast"
 )
 
 type Directory struct {
@@ -15,9 +16,9 @@ func NewDirectory() *Directory {
 	}
 }
 
-func (directory *Directory) CreatePackage(name string) (pkg *Package, err error) {
+func (directory *Directory) CreatePackage(name string, astFiles []*ast.File) (pkg *Package, err error) {
 	if directory.Package == nil {
-		pkg = NewPackage(name)
+		pkg = NewPackage(name, astFiles)
 		directory.Package = pkg
 	} else if directory.Package.Name != name {
 		err = errors.New("Cannot have two packages in one directory")

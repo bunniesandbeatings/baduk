@@ -1,6 +1,8 @@
 package architecture
 
 type Interface struct {
-	Name     string
-	Filename string
+	Name         string
+	Filename     string
+	Methods      []*Method
+	Implementers []Type
 }
