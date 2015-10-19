@@ -38,10 +38,11 @@ func (file *Package) AddFunc(name string, filename string) (function *Func) {
 	return
 }
 
-func (file *Package) AddMethod(name string, filename string, receiverType Type, parmtypes []Type, returnTypes []Type) (method *Method) {
+func (file *Package) AddMethod(name, pkg, filename string, receiverType Type, parmtypes []Type, returnTypes []Type) (method *Method) {
 	method = &Method{
 		Func: Func{
 			Name:        name,
+			Package:     pkg,
 			Filename:    filename,
 			ParmTypes:   parmtypes,
 			ReturnTypes: returnTypes,
