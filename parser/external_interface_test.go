@@ -12,6 +12,7 @@ import (
 
 func TestMatchSimpleMethodSetToExternalInterface(t *testing.T) {
 	pkg := parseMethodSetsAndExternalPackage(t)
+	checkMethodSetMatchSize(t, pkg, "ExternalMixer", 1)
 	checkMethodSetMatch(t, pkg, "ExternalMixer", "test_method_sets.ConcreteMixer")
 }
 
