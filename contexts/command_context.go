@@ -1,32 +1,37 @@
 package contexts
 
 import (
-	"flag"
-	"log"
+	"github.com/codegangsta/cli"
 	"os"
 )
 
 type CommandContext struct {
 	GoRoot     string
 	GoPath     string
-	OutputPath string
 	ImportSpec string
 }
 
-func CreateCommandContext(usage func()) CommandContext {
+func CreateCommandContextFlags() []cli.Flag {
+	return []cli.Flag{
+		cli.StringFlag{
+			Name:  "gopath",
+			Value: os.Getenv("GOPATH"),
+			Usage: "allows you to choose a different GOPATH to use during analysis",
+		},
+		cli.StringFlag{
+			Name:  "goroot",
+			Value: os.Getenv("GOROOT"),
+			Usage: "allows you to choose a different GOROOT to use during analysis",
+		},
+	}
+}
+
+func CreateCommandContext(cliContext *cli.Context) CommandContext {
 	commandContext := CommandContext{}
 
-	flag.StringVar(&commandContext.GoPath, "gopath", os.Getenv("GOPATH"), "allows you to choose a different GOPATH to use during analysis")
-	flag.StringVar(&commandContext.GoRoot, "goroot", os.Getenv("GOROOT"), "allows you to choose a different GOROOT to use during analysis")
-
-	flag.StringVar(&commandContext.OutputPath, "output", "./output.xml", "where to output the result of the analysis")
-
-	flag.Usage = usage
-	flag.Parse()
-
-	commandContext.ImportSpec = flag.Arg(0)
-
-	log.Printf("Command context: %s\n", os.Args)
+	commandContext.GoRoot = cliContext.String("goroot")
+	commandContext.GoPath = cliContext.String("gopath")
+	commandContext.ImportSpec = cliContext.Args()[0]
 
 	return commandContext
 }

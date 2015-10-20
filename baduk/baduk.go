@@ -4,11 +4,14 @@ import (
 	"github.com/bunniesandbeatings/go-flavor-parser/contexts"
 	"github.com/bunniesandbeatings/go-flavor-parser/parser"
 
-	"flag"
-	"log"
 	"os"
 
+	"flag"
+	"fmt"
+	"github.com/codegangsta/cli"
 	"github.com/davecgh/go-spew/spew"
+	"log"
+	"runtime/debug"
 )
 
 func usage() {
@@ -21,43 +24,30 @@ func usage() {
 
 func main() {
 
-	//	defer func() {
-	//		if err := recover(); err != nil {
-	//			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
-	//			debug.PrintStack()
-	//			os.Exit(1)
-	//		}
-	//	}()
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
+			debug.PrintStack()
+			os.Exit(1)
+		}
+	}()
 
-	commandContext := contexts.CreateCommandContext(usage)
-	buildContext := contexts.CreateBuildContext(commandContext)
+	app := cli.NewApp()
+	app.Name = "baduk"
+	app.Usage = "Intermediate Golang AST for Architectural Viz"
 
-	parser := parser.NewParser(buildContext)
+	app.Flags = contexts.CreateCommandContextFlags()
 
-	parser.ParseImportSpec(commandContext.ImportSpec)
+	app.Action = func(cliContext *cli.Context) {
+		commandContext := contexts.CreateCommandContext(cliContext)
+		buildContext := contexts.CreateBuildContext(commandContext)
 
-	log.Println(spew.Sdump(parser.GetArchitecture()))
+		parser := parser.NewParser(buildContext)
 
-	//	datafile := datafiles.NewDataFile("com.bunniesandbeatings.go-flavor")
-	//
-	//	allFiles.ForEach(func(importPath string, files Any) {
-	//		module := datafiles.Module{
-	//			Name: importPath,
-	//			Id: importPath,
-	//			Type: "package",
-	//		}
-	//
-	//		datafile.Modules = append(datafile.Modules, module)
-	//		log.Printf("%s:", importPath)
-	//
-	//		for _, file := range files.([]*ast.File) {
-	//			log.Printf("\t%#v:", *file)
-	//		}
-	//
-	//	})
+		parser.ParseImportSpec(commandContext.ImportSpec)
 
-	//	ioutil.WriteFile(commandContext.OutputPath, datafile.ToXML(), 0644)
-	//
-	//	fmt.Printf("Output written to '%s'\n", commandContext.OutputPath)
-	//	_ = packages.Packages(allFiles)
+		log.Println(spew.Sdump(parser.GetArchitecture()))
+	}
+
+	app.Run(os.Args)
 }
