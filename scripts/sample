@@ -2,16 +2,12 @@
 
 set -eo pipefail
 
-dir=`mktemp -d`
-
 export GO15VENDOREXPERIMENT=1
 
-go build -o $dir/baduk github.com/bunniesandbeatings/go-flavor-parser/baduk
+go install github.com/bunniesandbeatings/go-flavor-parser/baduk
 
 echo
 echo "***** RUNNING"
 echo
 
-$dir/baduk -output final/output.xml github.com/bunniesandbeatings/go-flavor-parser/...
-
-rm -rf $dir
+baduk -output final/output.xml github.com/bunniesandbeatings/go-flavor-parser/...
