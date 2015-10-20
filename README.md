@@ -25,7 +25,7 @@ go test github.com/bunniesandbeatings/go-flavor-parser/...
 
 Binary is called `baduk`
 
-`./scripts/sample` has  sample usage/
+`./scripts/sample` has sample usage (assuming the usual $GOPATH and $PATH settings).
 
 ## Contributing
 
