@@ -1,53 +1,52 @@
 package main
 
 import (
-	"github.com/bunniesandbeatings/go-flavor-parser/contexts"
-	"github.com/bunniesandbeatings/go-flavor-parser/parser"
-
+	"fmt"
 	"os"
 
-	"flag"
-	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/davecgh/go-spew/spew"
-	"log"
-	"runtime/debug"
+	"github.com/bunniesandbeatings/go-flavor-parser/baduk/commands"
+	"github.com/jawher/mow.cli"
 )
 
-func usage() {
-	appName := os.Args[0]
-	log.Printf("%s usage:\n", appName)
-	log.Printf("\t%s [flags] packages # see 'go help packages'\n", appName)
-	log.Printf("Flags:\n")
-	flag.PrintDefaults()
-}
-
 func main() {
+	doc := `Intermediate Golang AST for Architectural Viz
+Copyright (c) 2014 Rasheed Abdul-Aziz
 
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
-			debug.PrintStack()
-			os.Exit(1)
+License: MIT
+
+Authors: Rasheed Abdul-Aziz, Glyn Normington`
+
+	parse := cli.App("baduk", doc)
+
+	gopath := parse.String(cli.StringOpt{
+		Name:   "gopath",
+		Value:  "",
+		Desc:   "allows you to choose a different GOPATH to use during analysis",
+		EnvVar: "GOPATH",
+	})
+
+	goroot := parse.String(cli.StringOpt{
+		Name:   "goroot",
+		Value:  "",
+		Desc:   "allows you to choose a different GOROOT to use during analysis",
+		EnvVar: "GOROOT",
+	})
+
+	packages := parse.StringArg("PACKAGES", "", "the package specification to parse")
+
+	parse.Spec = "[OPTIONS] PACKAGES"
+
+	parse.Version("v version", fmt.Sprintf("baduk %s", VERSION))
+
+	parse.Action = func() {
+		parseContext := &commands.ParseContext{
+			GOROOT:     *goroot,
+			GOPATH:     *gopath,
+			ImportSpec: *packages,
 		}
-	}()
 
-	app := cli.NewApp()
-	app.Name = "baduk"
-	app.Usage = "Intermediate Golang AST for Architectural Viz"
-
-	app.Flags = contexts.CreateCommandContextFlags()
-
-	app.Action = func(cliContext *cli.Context) {
-		commandContext := contexts.CreateCommandContext(cliContext)
-		buildContext := contexts.CreateBuildContext(commandContext)
-
-		parser := parser.NewParser(buildContext)
-
-		parser.ParseImportSpec(commandContext.ImportSpec)
-
-		log.Println(spew.Sdump(parser.GetArchitecture()))
+		commands.ParsePackages(parseContext)
 	}
 
-	app.Run(os.Args)
+	parse.Run(os.Args)
 }
