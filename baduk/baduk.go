@@ -32,6 +32,13 @@ Authors: Rasheed Abdul-Aziz, Glyn Normington`
 		EnvVar: "GOROOT",
 	})
 
+	outPath := parse.String(cli.StringOpt{
+		Name:   "output",
+		Value:  "",
+		Desc:   "where to save output to. Leave unspecified for STDOUT",
+	})
+
+
 	packages := parse.StringArg("PACKAGES", "", "the package specification to parse")
 
 	parse.Spec = "[OPTIONS] PACKAGES"
@@ -43,6 +50,7 @@ Authors: Rasheed Abdul-Aziz, Glyn Normington`
 			GOROOT:     *goroot,
 			GOPATH:     *gopath,
 			ImportSpec: *packages,
+			OutPath: 		*outPath,
 		}
 
 		commands.ParsePackages(parseContext)
