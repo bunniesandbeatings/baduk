@@ -2,12 +2,8 @@
 
 set -eo pipefail
 
-export GO15VENDOREXPERIMENT=1
-
-go install github.com/bunniesandbeatings/baduk/baduk
-
 echo
 echo "***** RUNNING"
 echo
 
-baduk github.com/bunniesandbeatings/baduk/...
+go run github.com/bunniesandbeatings/baduk parse ./...
