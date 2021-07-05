@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bunniesandbeatings/go-flavor-parser/architecture"
-	"github.com/bunniesandbeatings/go-flavor-parser/contexts"
-	"github.com/bunniesandbeatings/go-flavor-parser/parser"
+	"github.com/bunniesandbeatings/baduk/architecture"
+	"github.com/bunniesandbeatings/baduk/contexts"
+	"github.com/bunniesandbeatings/baduk/parser"
 )
 
 func TestParseVoidMethod(t *testing.T) {

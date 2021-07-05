@@ -4,10 +4,10 @@ set -eo pipefail
 
 export GO15VENDOREXPERIMENT=1
 
-go install github.com/bunniesandbeatings/go-flavor-parser/baduk
+go install github.com/bunniesandbeatings/baduk/baduk
 
 echo
 echo "***** RUNNING"
 echo
 
-baduk github.com/bunniesandbeatings/go-flavor-parser/...
+baduk github.com/bunniesandbeatings/baduk/...

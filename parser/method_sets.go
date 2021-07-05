@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/bunniesandbeatings/go-flavor-parser/architecture"
+import "github.com/bunniesandbeatings/baduk/architecture"
 
 func (parser *Parser) MatchMethodSets() {
 	for _, dir := range parser.arch.Root.Directories {

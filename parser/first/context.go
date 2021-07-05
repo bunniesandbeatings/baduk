@@ -3,7 +3,7 @@ package first
 import (
 	"go/token"
 
-	"github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	"github.com/bunniesandbeatings/baduk/architecture"
 )
 
 type Context struct {

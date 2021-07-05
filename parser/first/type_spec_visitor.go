@@ -3,7 +3,7 @@ package first
 import (
 	"go/ast"
 
-	"github.com/bunniesandbeatings/go-flavor-parser/architecture"
+	"github.com/bunniesandbeatings/baduk/architecture"
 	"github.com/davecgh/go-spew/spew"
 )
 

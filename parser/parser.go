@@ -9,8 +9,8 @@ import (
 	"log"
 	"path/filepath"
 
-	arch "github.com/bunniesandbeatings/go-flavor-parser/architecture"
-	"github.com/bunniesandbeatings/go-flavor-parser/parser/first"
+	arch "github.com/bunniesandbeatings/baduk/architecture"
+	"github.com/bunniesandbeatings/baduk/parser/first"
 	"github.com/bunniesandbeatings/gotool"
 )
 
